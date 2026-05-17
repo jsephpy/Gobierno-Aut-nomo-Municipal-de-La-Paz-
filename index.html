@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GAMLP – Gobierno Autónomo Municipal de La Paz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:   #0B1C35;
+      --navy2:  #0F2545;
+      --gold:   #C9920C;
+      --gold2:  #E8B44A;
+      --red:    #B71C1C;
+      --white:  #F5F0E8;
+      --gray:   #8A9BB0;
+      --light:  #EEF2F7;
+      --card-bg:#132038;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      background: var(--navy2);
+      border-bottom: 1px solid rgba(201,146,12,.25);
+      padding: 6px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .75rem; color: var(--gray);
+    }
+    .topbar a { color: var(--gray); text-decoration: none; margin-left: 16px; transition: color .2s; }
+    .topbar a:hover { color: var(--gold2); }
+    .topbar-left span { margin-right: 16px; }
+    #live-clock { color: var(--gold2); font-weight: 600; }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky; top: 0; z-index: 999;
+      background: rgba(11,28,53,.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 2px solid var(--gold);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+    .logo-wrap img { height: 48px; filter: drop-shadow(0 0 8px rgba(201,146,12,.5)); }
+    .logo-text { line-height: 1.2; }
+    .logo-text .main { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold2); letter-spacing: .5px; }
+    .logo-text .sub  { font-size: .65rem; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; }
+
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a {
+      color: var(--white); font-size: .85rem; font-weight: 500;
+      padding: 6px 14px; border-radius: 6px; text-decoration: none;
+      transition: all .2s; position: relative;
+    }
+    nav a::after {
+      content: ''; position: absolute; bottom: 2px; left: 14px; right: 14px;
+      height: 2px; background: var(--gold); transform: scaleX(0);
+      transition: transform .2s; border-radius: 2px;
+    }
+    nav a:hover { color: var(--gold2); }
+    nav a:hover::after { transform: scaleX(1); }
+
+    .btn-search {
+      background: var(--gold); color: var(--navy) !important; font-weight: 600 !important;
+      padding: 8px 18px !important; border-radius: 8px;
+    }
+    .btn-search:hover { background: var(--gold2); }
+    .btn-search::after { display: none !important; }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; height: 92vh; min-height: 560px;
+      display: flex; align-items: center; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #040e1e 0%, #0b1c35 40%, #0f2545 100%);
+    }
+    .hero-pattern {
+      position: absolute; inset: 0; opacity: .07;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,146,12,.4) 40px),
+                        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,146,12,.4) 40px);
+    }
+    .hero-glow {
+      position: absolute; top: -200px; right: -200px;
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,146,12,.15) 0%, transparent 70%);
+      animation: pulse 6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.1);opacity:1} }
+
+    .hero-content {
+      position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 0 40px;
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 60px; width: 100%;
+    }
+    .hero-text { animation: fadeUp .9s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,146,12,.15); border: 1px solid rgba(201,146,12,.4);
+      color: var(--gold2); font-size: .75rem; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 100px; margin-bottom: 24px;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: blink 1.4s ease infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero-title em { color: var(--gold2); font-style: normal; }
+
+    .hero-desc { color: var(--gray); font-size: 1rem; line-height: 1.8; margin-bottom: 36px; max-width: 480px; }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      padding: 14px 28px; border-radius: 10px; text-decoration: none;
+      font-size: .9rem; transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(201,146,12,.4);
+    }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,146,12,.5); }
+    .btn-secondary {
+      border: 1.5px solid rgba(255,255,255,.25); color: var(--white);
+      padding: 14px 28px; border-radius: 10px; text-decoration: none;
+      font-size: .9rem; transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-secondary:hover { border-color: var(--gold2); color: var(--gold2); background: rgba(201,146,12,.08); }
+
+    .hero-shield {
+      display: flex; justify-content: center; align-items: center;
+      animation: fadeUp 1.1s .2s ease both;
+    }
+    .shield-glow {
+      position: relative; display: inline-flex;
+      filter: drop-shadow(0 0 40px rgba(201,146,12,.4));
+      animation: floatShield 5s ease-in-out infinite;
+    }
+    @keyframes floatShield { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    .shield-glow img { width: 300px; max-width: 90%; }
+    .shield-ring {
+      position: absolute; inset: -40px; border-radius: 50%;
+      border: 1px solid rgba(201,146,12,.2);
+      animation: spin 20s linear infinite;
+    }
+    .shield-ring2 {
+      position: absolute; inset: -70px; border-radius: 50%;
+      border: 1px dashed rgba(201,146,12,.1);
+      animation: spin 35s linear infinite reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── STATS STRIP ─── */
+    .stats-strip {
+      background: var(--gold); padding: 20px 40px;
+      display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; color: var(--navy); }
+    .stat .num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+    .stat .lbl { font-size: .7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: .75; }
+
+    /* ─── SECTIONS COMMON ─── */
+    section { padding: 90px 40px; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-tag {
+      display: inline-block; font-size: .7rem; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; line-height: 1.2; color: var(--white);
+    }
+    .section-title em { color: var(--gold2); font-style: normal; }
+    .section-line {
+      width: 60px; height: 3px; background: var(--gold);
+      margin: 16px auto 0; border-radius: 2px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ─── NEWS CAROUSEL ─── */
+    #noticias { background: var(--navy2); }
+    .carousel-wrap { position: relative; overflow: hidden; }
+    .carousel-track {
+      display: flex; gap: 24px; transition: transform .5s cubic-bezier(.4,0,.2,1);
+    }
+    .news-card {
+      flex: 0 0 calc(33.333% - 16px); background: var(--card-bg);
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(201,146,12,.12);
+      transition: transform .3s, box-shadow .3s;
+      cursor: pointer;
+    }
+    .news-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,.4); border-color: rgba(201,146,12,.35); }
+
+    .news-img {
+      width: 100%; height: 200px; object-fit: cover;
+      background: linear-gradient(135deg, #0f2545, #1a3560);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .news-img img { width: 100%; height: 100%; object-fit: cover; }
+    .news-img-placeholder {
+      width: 100%; height: 200px;
+      background: linear-gradient(135deg, #0f2545 0%, #1a3560 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; opacity: .5;
+    }
+    .news-cat {
+      position: absolute; top: 14px; left: 14px;
+      background: var(--gold); color: var(--navy); font-size: .65rem;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .news-body { padding: 22px; }
+    .news-date { font-size: .72rem; color: var(--gold); margin-bottom: 10px; }
+    .news-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; line-height: 1.4; margin-bottom: 10px; }
+    .news-excerpt { font-size: .82rem; color: var(--gray); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-link { display: inline-flex; align-items: center; gap: 6px; color: var(--gold2); font-size: .8rem; font-weight: 600; margin-top: 14px; text-decoration: none; transition: gap .2s; }
+    .news-link:hover { gap: 10px; }
+
+    .carousel-controls { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 36px; }
+    .carousel-btn {
+      width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(201,146,12,.4);
+      background: transparent; color: var(--gold2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all .2s;
+    }
+    .carousel-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+    .carousel-dots { display: flex; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(201,146,12,.3); cursor: pointer; transition: all .2s; }
+    .dot.active { background: var(--gold); width: 24px; border-radius: 4px; }
+
+    .news-status {
+      text-align: center; font-size: .8rem; color: var(--gray);
+      margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; animation: blink 2s infinite; }
+    .status-dot.loading { background: var(--gold); }
+    .status-dot.error { background: var(--red); animation: none; }
+
+    /* SKELETON */
+    .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.05) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .skel-card { flex: 0 0 calc(33.333% - 16px); background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid rgba(201,146,12,.08); }
+    .skel-img { height: 200px; }
+    .skel-body { padding: 22px; }
+    .skel-line { height: 12px; margin-bottom: 10px; }
+    .skel-title { height: 22px; width: 80%; margin-bottom: 8px; }
+    .skel-text { height: 10px; margin-bottom: 6px; }
+    .skel-text.short { width: 60%; }
+
+    /* ─── SERVICIOS ─── */
+    #servicios { background: var(--navy); }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .service-card {
+      background: var(--card-bg); border-radius: 16px; padding: 30px 24px;
+      border: 1px solid rgba(201,146,12,.1); text-align: center;
+      transition: all .3s; cursor: pointer; text-decoration: none; display: block;
+    }
+    .service-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 12px 40px rgba(201,146,12,.15); }
+    .service-icon { font-size: 2.4rem; margin-bottom: 16px; display: block; }
+    .service-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .service-desc { font-size: .78rem; color: var(--gray); line-height: 1.6; }
+    .service-arrow { display: inline-flex; align-items: center; gap: 4px; color: var(--gold2); font-size: .75rem; font-weight: 600; margin-top: 14px; }
+
+    /* ─── AGENDA / EVENTOS ─── */
+    #agenda { background: var(--navy2); }
+    .agenda-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .agenda-item {
+      background: var(--card-bg); border-radius: 14px; padding: 24px;
+      border: 1px solid rgba(201,146,12,.1); display: flex; gap: 20px;
+      transition: border-color .2s;
+    }
+    .agenda-item:hover { border-color: rgba(201,146,12,.4); }
+    .agenda-date {
+      flex-shrink: 0; width: 60px; text-align: center;
+      background: var(--gold); color: var(--navy); border-radius: 10px; padding: 10px 8px;
+    }
+    .agenda-date .day { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .agenda-date .month { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .agenda-info { flex: 1; }
+    .agenda-time { font-size: .72rem; color: var(--gold); margin-bottom: 6px; }
+    .agenda-title { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .agenda-place { font-size: .78rem; color: var(--gray); display: flex; align-items: center; gap: 4px; }
+
+    /* ─── AUTORIDADES ─── */
+    #autoridades { background: var(--navy); }
+    .authorities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
+    .authority-card {
+      background: var(--card-bg); border-radius: 18px; overflow: hidden;
+      border: 1px solid rgba(201,146,12,.12); text-align: center;
+      transition: all .3s;
+    }
+    .authority-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,.4); border-color: rgba(201,146,12,.35); }
+    .authority-photo {
+      height: 200px; background: linear-gradient(135deg, #0f2545, #1e3d6b);
+      display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; overflow: hidden;
+    }
+    .authority-photo::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+      background: linear-gradient(transparent, var(--card-bg));
+    }
+    .authority-body { padding: 20px; }
+    .authority-role { font-size: .68rem; color: var(--gold); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .authority-name { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; }
+
+    /* ─── TRANSPARENCIA STRIP ─── */
+    .transparency-strip {
+      background: linear-gradient(135deg, var(--red) 0%, #8B0000 100%);
+      padding: 48px 40px; text-align: center;
+    }
+    .transparency-strip h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; }
+    .transparency-strip p { color: rgba(255,255,255,.8); font-size: .95rem; margin-bottom: 28px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .transparency-btns { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .btn-white { background: #fff; color: var(--red); font-weight: 700; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-size: .88rem; transition: all .2s; }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+    .btn-outline-white { border: 2px solid rgba(255,255,255,.6); color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-size: .88rem; transition: all .2s; }
+    .btn-outline-white:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #040d1a; border-top: 1px solid rgba(201,146,12,.2);
+      padding: 60px 40px 30px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; max-width: 1200px; margin: 0 auto 40px; }
+    .footer-brand .logo-wrap { margin-bottom: 16px; }
+    .footer-brand p { font-size: .82rem; color: var(--gray); line-height: 1.8; max-width: 280px; }
+    .footer-social { display: flex; gap: 10px; margin-top: 20px; }
+    .social-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray); text-decoration: none; font-size: .9rem;
+      transition: all .2s;
+    }
+    .social-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+    .footer-col h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a { font-size: .82rem; color: var(--gray); text-decoration: none; transition: color .2s; display: flex; align-items: center; gap: 6px; }
+    .footer-col ul li a:hover { color: var(--gold2); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.07); padding-top: 24px; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom p { font-size: .75rem; color: var(--gray); }
+    .footer-bottom .powered { color: var(--gold); }
+
+    /* ─── BACK TO TOP ─── */
+    #back-top {
+      position: fixed; bottom: 28px; right: 28px; z-index: 900;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--gold); color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; cursor: pointer; border: none;
+      box-shadow: 0 4px 20px rgba(201,146,12,.4);
+      opacity: 0; transition: opacity .3s, transform .2s;
+      pointer-events: none;
+    }
+    #back-top.show { opacity: 1; pointer-events: auto; }
+    #back-top:hover { transform: translateY(-3px); }
+
+    /* ─── MOBILE ─── */
+    .hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      color: var(--white); font-size: 1.4rem; padding: 4px 8px;
+    }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(4,13,26,.97); flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: var(--white); font-size: 1.5rem; text-decoration: none; font-family: 'Cormorant Garamond', serif; }
+    .close-menu { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--gold); font-size: 1.8rem; cursor: pointer; }
+
+    @media (max-width: 900px) {
+      nav { display: none; }
+      .hamburger { display: block; }
+      header { padding: 0 20px; }
+      .hero-content { grid-template-columns: 1fr; text-align: center; }
+      .hero-shield { display: none; }
+      .hero-actions { justify-content: center; }
+      .agenda-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      section { padding: 60px 20px; }
+      .stats-strip { gap: 30px; padding: 20px; }
+      .news-card { flex: 0 0 calc(100% - 0px); }
+    }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .topbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span>🇧🇴 La Paz, Bolivia</span>
+    <span id="live-clock">--:--:-- AM</span>
+  </div>
+  <div>
+    <a href="#">Contacto</a>
+    <a href="#">Mapa del Sitio</a>
+    <a href="#">Accesibilidad</a>
+    <a href="#">🌡 Clima</a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo-wrap">
+    <img src="GAMLP26.png" alt="Escudo La Paz" onerror="this.style.display='none'"/>
+    <div class="logo-text">
+      <div class="main">Gobierno Autónomo Municipal</div>
+      <div class="sub">de La Paz — Bolivia</div>
+    </div>
+  </a>
+  <nav>
+    <a href="#noticias">Noticias</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#agenda">Agenda</a>
+    <a href="#autoridades">Autoridades</a>
+    <a href="#transparencia">Transparencia</a>
+    <a href="https://lapaz.bo" class="btn-search" target="_blank">Portal Oficial ↗</a>
+  </nav>
+  <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.add('open')">☰</button>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu">
+  <button class="close-menu" onclick="document.querySelector('.mobile-menu').classList.remove('open')">✕</button>
+  <a href="#noticias" onclick="document.querySelector('.mobile-menu').classList.remove('open')">Noticias</a>
+  <a href="#servicios" onclick="document.querySelector('.mobile-menu').classList.remove('open')">Servicios</a>
+  <a href="#agenda" onclick="document.querySelector('.mobile-menu').classList.remove('open')">Agenda</a>
+  <a href="#autoridades" onclick="document.querySelector('.mobile-menu').classList.remove('open')">Autoridades</a>
+  <a href="https://lapaz.bo" target="_blank">Portal Oficial ↗</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge"><span></span>Gestión Municipal 2025–2029</div>
+      <h1 class="hero-title">
+        Construyendo la <em>La Paz</em><br/>que Todos Merecemos
+      </h1>
+      <p class="hero-desc">
+        El Gobierno Autónomo Municipal de La Paz trabaja cada día por el bienestar, el desarrollo sostenible y la dignidad de sus ciudadanos.
+      </p>
+      <div class="hero-actions">
+        <a href="#servicios" class="btn-primary">🏛 Ver Servicios</a>
+        <a href="#noticias" class="btn-secondary">📰 Últimas Noticias</a>
+      </div>
+    </div>
+    <div class="hero-shield">
+      <div class="shield-glow">
+        <div class="shield-ring"></div>
+        <div class="shield-ring2"></div>
+        <img src="GAMLP26.png" alt="Escudo Municipal de La Paz"
+             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><text y=%22.9em%22 font-size=%22160%22>🏛</text></svg>'"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat"><div class="num">900K+</div><div class="lbl">Ciudadanos</div></div>
+  <div class="stat"><div class="num">23</div><div class="lbl">Macrodistritos</div></div>
+  <div class="stat"><div class="num">3,600m</div><div class="lbl">Altitud Promedio</div></div>
+  <div class="stat"><div class="num">1548</div><div class="lbl">Año de Fundación</div></div>
+  <div class="stat"><div class="num">200+</div><div class="lbl">Servicios Municipales</div></div>
+</div>
+
+<!-- NOTICIAS -->
+<section id="noticias">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Actualidad</div>
+      <h2 class="section-title">Últimas <em>Noticias</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="news-status">
+      <div class="status-dot loading" id="status-dot"></div>
+      <span id="status-text">Cargando noticias desde el portal oficial…</span>
+    </div>
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="carousel-track">
+        <!-- Skeletons mientras carga -->
+        <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton"></div><div class="skel-title skeleton"></div><div class="skel-text skeleton"></div><div class="skel-text skeleton short"></div></div></div>
+        <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton"></div><div class="skel-title skeleton"></div><div class="skel-text skeleton"></div><div class="skel-text skeleton short"></div></div></div>
+        <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton"></div><div class="skel-title skeleton"></div><div class="skel-text skeleton"></div><div class="skel-text skeleton short"></div></div></div>
+      </div>
+    </div>
+    <div class="carousel-controls">
+      <button class="carousel-btn" id="btn-prev">&#8592;</button>
+      <div class="carousel-dots" id="dots"></div>
+      <button class="carousel-btn" id="btn-next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Atención al Ciudadano</div>
+      <h2 class="section-title">Servicios <em>Municipales</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="services-grid">
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🏗</span>
+        <div class="service-name">Obras Públicas</div>
+        <div class="service-desc">Infraestructura vial, obras de urbanización y mantenimiento urbano.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">📄</span>
+        <div class="service-name">Trámites en Línea</div>
+        <div class="service-desc">Licencias, certificaciones, pagos y declaraciones desde casa.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🌿</span>
+        <div class="service-name">Medio Ambiente</div>
+        <div class="service-desc">Áreas verdes, reciclaje, residuos sólidos y calidad del aire.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🚍</span>
+        <div class="service-name">Transporte Urbano</div>
+        <div class="service-desc">Teleférico, Puma Katari y regulación del transporte público.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🏥</span>
+        <div class="service-name">Salud Municipal</div>
+        <div class="service-desc">Centros de salud, programas de prevención y atención primaria.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">📚</span>
+        <div class="service-name">Educación y Cultura</div>
+        <div class="service-desc">Bibliotecas, museos, becas estudiantiles y formación ciudadana.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🔒</span>
+        <div class="service-name">Seguridad Ciudadana</div>
+        <div class="service-desc">CCTV, brigadas municipales y prevención de delitos.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+      <a class="service-card" href="https://lapaz.bo" target="_blank">
+        <span class="service-icon">🏘</span>
+        <div class="service-name">Hábitat y Vivienda</div>
+        <div class="service-desc">Regularización predial, catastro y planificación territorial.</div>
+        <div class="service-arrow">Ver más ›</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- AGENDA -->
+<section id="agenda">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Próximos Eventos</div>
+      <h2 class="section-title">Agenda <em>Municipal</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="agenda-grid" id="agenda-grid">
+      <!-- Cargado dinámicamente -->
+    </div>
+  </div>
+</section>
+
+<!-- AUTORIDADES -->
+<section id="autoridades">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Gobierno Municipal</div>
+      <h2 class="section-title">Nuestras <em>Autoridades</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="authorities-grid">
+      <div class="authority-card">
+        <div class="authority-photo">🧑‍💼</div>
+        <div class="authority-body">
+          <div class="authority-role">Alcalde Municipal</div>
+          <div class="authority-name">Iván Arias Durán</div>
+        </div>
+      </div>
+      <div class="authority-card">
+        <div class="authority-photo">👩‍💼</div>
+        <div class="authority-body">
+          <div class="authority-role">Concejo Municipal</div>
+          <div class="authority-name">Mesa Directiva 2024</div>
+        </div>
+      </div>
+      <div class="authority-card">
+        <div class="authority-photo">🏛</div>
+        <div class="authority-body">
+          <div class="authority-role">Secretaría General</div>
+          <div class="authority-name">Secretarías Municipales</div>
+        </div>
+      </div>
+      <div class="authority-card">
+        <div class="authority-photo">⚖️</div>
+        <div class="authority-body">
+          <div class="authority-role">Control Gubernamental</div>
+          <div class="authority-name">Unidad de Auditoría</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSPARENCIA -->
+<div class="transparency-strip" id="transparencia">
+  <h2>Transparencia y Rendición de Cuentas</h2>
+  <p>Accedé a los informes de gestión, presupuestos ejecutados, licitaciones y contrataciones públicas del municipio.</p>
+  <div class="transparency-btns">
+    <a href="https://lapaz.bo" target="_blank" class="btn-white">📊 Ver Informes de Gestión</a>
+    <a href="https://lapaz.bo" target="_blank" class="btn-outline-white">📁 Licitaciones Abiertas</a>
+    <a href="https://lapaz.bo" target="_blank" class="btn-outline-white">💰 Presupuesto Ejecutado</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo-wrap">
+        <img src="GAMLP26.png" alt="GAMLP" style="height:44px" onerror="this.style.display='none'"/>
+        <div class="logo-text">
+          <div class="main">Gobierno Autónomo</div>
+          <div class="sub">Municipal de La Paz</div>
+        </div>
+      </a>
+      <p style="margin-top:16px">Trabajamos para construir una ciudad más justa, segura, verde y próspera para todos los paceños.</p>
+      <div class="footer-social">
+        <a class="social-btn" href="#" title="Facebook">f</a>
+        <a class="social-btn" href="#" title="Twitter/X">𝕏</a>
+        <a class="social-btn" href="#" title="YouTube">▶</a>
+        <a class="social-btn" href="#" title="Instagram">📷</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Institucional</h4>
+      <ul>
+        <li><a href="#">→ Misión y Visión</a></li>
+        <li><a href="#">→ Historia del GAMLP</a></li>
+        <li><a href="#">→ Marco Legal</a></li>
+        <li><a href="#">→ Plan de Desarrollo</a></li>
+        <li><a href="#">→ Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="#">→ Trámites en Línea</a></li>
+        <li><a href="#">→ Pago de Impuestos</a></li>
+        <li><a href="#">→ Denuncias</a></li>
+        <li><a href="#">→ Licencias</a></li>
+        <li><a href="#">→ Catastro</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li><a href="#">📍 Plaza Murillo, La Paz</a></li>
+        <li><a href="#">📞 (591-2) 2481000</a></li>
+        <li><a href="#">✉️ info@lapaz.bo</a></li>
+        <li><a href="#">🌐 lapaz.bo</a></li>
+        <li><a href="#">🕐 Lun–Vie 8:00–18:00</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Gobierno Autónomo Municipal de La Paz — Bolivia. Todos los derechos reservados.</p>
+    <p>Noticias actualizadas desde <span class="powered">lapaz.bo/wp-json/wp/v2/posts</span></p>
+  </div>
+</footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* ══════════════════════════════════════
+   RELOJ EN TIEMPO REAL
+══════════════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent = now.toLocaleTimeString('es-BO', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ══════════════════════════════════════
+   API DE NOTICIAS – WordPress REST API
+══════════════════════════════════════ */
+const API_URL = 'https://lapaz.bo/wp-json/wp/v2/posts?per_page=9&_embed&orderby=date&order=desc';
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutos
+
+let allNews = [];
+let currentIndex = 0;
+const VISIBLE = window.innerWidth <= 900 ? 1 : 3;
+
+function stripHtml(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || '';
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('es-BO', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function getImage(post) {
+  try {
+    return post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
+  } catch { return null; }
+}
+
+function getCategory(post) {
+  try {
+    return post._embedded?.['wp:term']?.[0]?.[0]?.name || 'Municipal';
+  } catch { return 'Municipal'; }
+}
+
+function buildCard(post) {
+  const img = getImage(post);
+  const imgHtml = img
+    ? `<div class="news-img" style="position:relative;overflow:hidden"><img src="${img}" alt="Noticia" loading="lazy" style="width:100%;height:200px;object-fit:cover"/><span class="news-cat">${getCategory(post)}</span></div>`
+    : `<div class="news-img-placeholder" style="position:relative"><span>📰</span><span class="news-cat" style="position:absolute;top:14px;left:14px">${getCategory(post)}</span></div>`;
+
+  const title = stripHtml(post.title?.rendered || 'Sin título');
+  const excerpt = stripHtml(post.excerpt?.rendered || post.content?.rendered || '').slice(0, 180) + '…';
+  const date = formatDate(post.date);
+  const link = post.link || 'https://lapaz.bo';
+
+  return `
+    <div class="news-card" onclick="window.open('${link}','_blank')">
+      ${imgHtml}
+      <div class="news-body">
+        <div class="news-date">📅 ${date}</div>
+        <div class="news-title">${title}</div>
+        <div class="news-excerpt">${excerpt}</div>
+        <a class="news-link" href="${link}" target="_blank">Leer noticia completa →</a>
+      </div>
+    </div>`;
+}
+
+function buildFallbackCards() {
+  const fallback = [
+    { title:'Obras de pavimentación en macrodistrito Sur', date:'2025-05-14', cat:'Obras Públicas', excerpt:'El GAMLP inicia trabajos de pavimentación en las calles principales del macrodistrito Sur para mejorar la movilidad urbana de los vecinos.' },
+    { title:'Feria ciudadana de servicios municipales', date:'2025-05-13', cat:'Servicios', excerpt:'Este sábado se realizará una feria gratuita donde los ciudadanos podrán realizar trámites, consultas y acceder a servicios municipales sin costo.' },
+    { title:'La Paz implementa sistema de reciclaje por zonas', date:'2025-05-12', cat:'Medio Ambiente', excerpt:'El nuevo programa de reciclaje diferenciado permitirá reducir en un 30% los residuos sólidos en los próximos 12 meses según las autoridades.' },
+    { title:'Apertura de nuevo centro de salud en El Alto', date:'2025-05-11', cat:'Salud', excerpt:'El municipio inauguró un moderno centro de salud con atención primaria, odontología y laboratorio para más de 15,000 vecinos del sector.' },
+    { title:'Teleférico amplía horario nocturno los fines de semana', date:'2025-05-10', cat:'Transporte', excerpt:'Las líneas Roja, Amarilla y Verde del Teleférico extenderán su servicio hasta las 23:00 horas los viernes y sábados durante el mes de mayo.' },
+    { title:'Rendición de cuentas: gestión municipal 2024', date:'2025-05-09', cat:'Transparencia', excerpt:'El Alcalde presentó ante el Concejo Municipal y la ciudadanía el informe completo de ejecución presupuestaria y obras realizadas durante 2024.' },
+  ];
+  return fallback.map(n => `
+    <div class="news-card">
+      <div class="news-img-placeholder" style="position:relative"><span>📰</span><span class="news-cat" style="position:absolute;top:14px;left:14px">${n.cat}</span></div>
+      <div class="news-body">
+        <div class="news-date">📅 ${formatDate(n.date)}</div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-excerpt">${n.excerpt}</div>
+        <a class="news-link" href="https://lapaz.bo" target="_blank">Leer en portal oficial →</a>
+      </div>
+    </div>`);
+}
+
+function renderCarousel(cards) {
+  const track = document.getElementById('carousel-track');
+  track.innerHTML = cards.join('');
+  buildDots(cards.length);
+  goTo(0);
+}
+
+function buildDots(total) {
+  const pages = Math.max(1, total - VISIBLE + 1);
+  const container = document.getElementById('dots');
+  container.innerHTML = '';
+  for (let i = 0; i < pages; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    container.appendChild(d);
+  }
+}
+
+function goTo(i) {
+  const cards = document.querySelectorAll('#carousel-track .news-card, #carousel-track .skel-card');
+  const total = cards.length;
+  const max = Math.max(0, total - VISIBLE);
+  currentIndex = Math.min(Math.max(i, 0), max);
+  const cardW = cards[0]?.offsetWidth || 0;
+  const gap = 24;
+  document.getElementById('carousel-track').style.transform = `translateX(-${currentIndex * (cardW + gap)}px)`;
+  document.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === currentIndex));
+}
+
+document.getElementById('btn-prev').onclick = () => goTo(currentIndex - 1);
+document.getElementById('btn-next').onclick = () => goTo(currentIndex + 1);
+
+// Auto-advance
+let autoPlay = setInterval(() => goTo(currentIndex + 1), 5000);
+document.getElementById('carousel-track').addEventListener('mouseenter', () => clearInterval(autoPlay));
+document.getElementById('carousel-track').addEventListener('mouseleave', () => {
+  clearInterval(autoPlay);
+  autoPlay = setInterval(() => goTo(currentIndex + 1), 5000);
+});
+
+async function fetchNews() {
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  dot.className  = 'status-dot loading';
+  text.textContent = 'Actualizando noticias…';
+
+  try {
+    const res  = await fetch(API_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (!data.length) throw new Error('Sin noticias');
+
+    allNews = data;
+    renderCarousel(data.map(buildCard));
+
+    dot.className  = 'status-dot';
+    dot.style.background = '#4CAF50';
+    text.textContent = `✓ ${data.length} noticias cargadas · Actualizado: ${new Date().toLocaleTimeString('es-BO')}`;
+  } catch (err) {
+    console.warn('API:', err.message, '— usando contenido de respaldo');
+    const cards = buildFallbackCards();
+    allNews = cards;
+    renderCarousel(cards);
+    dot.className  = 'status-dot error';
+    text.textContent = `Conectando a lapaz.bo… mostrando contenido reciente guardado`;
+  }
+}
+
+// Carga inicial + refresco automático cada 5 minutos
+fetchNews();
+setInterval(fetchNews, REFRESH_INTERVAL);
+
+/* ══════════════════════════════════════
+   AGENDA EVENTOS (estática – reemplazar con API cuando disponible)
+══════════════════════════════════════ */
+const eventos = [
+  { dia:'20', mes:'May', hora:'09:00 – 12:00', titulo:'Reunión Vecinal Macrodistrito Cotahuma', lugar:'Subalcaldía Cotahuma' },
+  { dia:'22', mes:'May', hora:'15:00 – 18:00', titulo:'Feria de Emprendimiento Municipal', lugar:'Plaza del Estudiante' },
+  { dia:'25', mes:'May', hora:'08:00 – 12:00', titulo:'Jornada de Limpieza Ciudadana', lugar:'Macrodistrito Sur' },
+  { dia:'28', mes:'May', hora:'10:00 – 13:00', titulo:'Presentación Plan de Desarrollo 2025', lugar:'Sala de Sesiones GAMLP' },
+  { dia:'01', mes:'Jun', hora:'09:00 – 17:00', titulo:'Concejo Municipal Abierto', lugar:'Sede Legislativa Municipal' },
+  { dia:'05', mes:'Jun', hora:'08:30 – 12:00', titulo:'Día Mundial del Medio Ambiente', lugar:'Parque Urbano Central' },
+];
+
+const agendaGrid = document.getElementById('agenda-grid');
+agendaGrid.innerHTML = eventos.map(e => `
+  <div class="agenda-item">
+    <div class="agenda-date"><div class="day">${e.dia}</div><div class="month">${e.mes}</div></div>
+    <div class="agenda-info">
+      <div class="agenda-time">🕐 ${e.hora}</div>
+      <div class="agenda-title">${e.titulo}</div>
+      <div class="agenda-place">📍 ${e.lugar}</div>
+    </div>
+  </div>`).join('');
+
+/* ══════════════════════════════════════
+   BACK TO TOP BUTTON
+══════════════════════════════════════ */
+const backTop = document.getElementById('back-top');
+window.addEventListener('scroll', () => backTop.classList.toggle('show', window.scrollY > 400));
+</script>
+</body>
+</html>
